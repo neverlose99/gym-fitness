@@ -14,6 +14,7 @@ class Member extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'user_id', // THÊM FIELD NÀY
         'name',
         'email',
         'phone',
@@ -40,7 +41,13 @@ class Member extends Model
         'membership_price' => 'decimal:2',
     ];
 
-    // Relationships
+    // Relationship với User
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
+
+    // Relationships khác giữ nguyên
     public function bookings()
     {
         return $this->hasMany(Booking::class);

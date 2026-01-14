@@ -9,8 +9,8 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB; // THÊM DÒNG NÀY
 
 class MemberController extends Controller
 {
@@ -22,8 +22,26 @@ class MemberController extends Controller
     // Trang profile
     public function profile()
     {
-        $member = Member::with(['bookings.gymClass'])
-            ->findOrFail(Auth::id());
+        $user = Auth::user();
+        $member = $user->member;
+
+        // Nếu chưa có member, tạo mới
+        if (!$member) {
+            $member = Member::create([
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => '',
+                'membership_type' => 'basic',
+                'membership_start' => now(),
+                'membership_end' => now()->addMonth(1),
+                'membership_price' => 0,
+                'status' => 'active',
+            ]);
+        }
+
+        // Load relationships
+        $member->load(['bookings.gymClass']);
 
         $stats = [
             'total_bookings' => $member->bookings()->count(),
@@ -37,7 +55,12 @@ class MemberController extends Controller
     // Cập nhật profile
     public function updateProfile(Request $request)
     {
-        $member = Member::findOrFail(Auth::id());
+        $user = Auth::user();
+        $member = $user->member;
+
+        if (!$member) {
+            return back()->with('error', 'Không tìm thấy thông tin thành viên!');
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -62,7 +85,16 @@ class MemberController extends Controller
             $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
 
+        // Cập nhật member
         $member->update($validated);
+
+        // Cập nhật tên và email trong bảng users
+        DB::table('users')
+            ->where('id', $user->id)
+            ->update([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+            ]);
 
         return back()->with('success', 'Cập nhật thông tin thành công!');
     }
@@ -70,7 +102,12 @@ class MemberController extends Controller
     // Gia hạn membership
     public function renewMembership(Request $request)
     {
-        $member = Member::findOrFail(Auth::id());
+        $user = Auth::user();
+        $member = $user->member;
+
+        if (!$member) {
+            return back()->with('error', 'Không tìm thấy thông tin thành viên!');
+        }
 
         $validated = $request->validate([
             'membership_type' => 'required|in:basic,premium,vip',

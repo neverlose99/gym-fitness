@@ -55,11 +55,27 @@ class BookingController extends Controller
             return back()->with('error', 'Lớp học đã đầy!');
         }
 
-        // Lấy member_id từ auth hoặc từ request
-        $memberId = Auth::id(); // Hoặc $request->member_id nếu admin đặt cho member
+        // LẤY MEMBER TỪ USER HIỆN TẠI
+        $member = Auth::user()->member;
+
+        // Kiểm tra member có tồn tại không
+        if (!$member) {
+            // Tự động tạo member nếu chưa có
+            $member = Member::create([
+                'user_id' => Auth::id(),
+                'name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+                'phone' => '',
+                'membership_type' => 'basic',
+                'membership_start' => now(),
+                'membership_end' => now()->addMonth(1),
+                'membership_price' => 0,
+                'status' => 'active',
+            ]);
+        }
 
         // Kiểm tra member đã đặt lớp này vào ngày này chưa
-        $existingBooking = Booking::where('member_id', $memberId)
+        $existingBooking = Booking::where('member_id', $member->id)
             ->where('class_id', $validated['class_id'])
             ->where('booking_date', $validated['booking_date'])
             ->whereIn('status', ['pending', 'confirmed'])
@@ -74,7 +90,7 @@ class BookingController extends Controller
 
             // Tạo booking
             $booking = Booking::create([
-                'member_id' => $memberId,
+                'member_id' => $member->id, // SỬ DỤNG MEMBER ID
                 'class_id' => $validated['class_id'],
                 'booking_date' => $validated['booking_date'],
                 'booking_time' => $validated['booking_time'] ?? $class->start_time,
@@ -98,8 +114,15 @@ class BookingController extends Controller
     // Hiển thị chi tiết booking
     public function show($id)
     {
+        $member = Auth::user()->member;
+
+        if (!$member) {
+            return redirect()->route('home')
+                ->with('error', 'Không tìm thấy thông tin thành viên!');
+        }
+
         $booking = Booking::with(['gymClass.trainer', 'member'])
-            ->where('member_id', Auth::id())
+            ->where('member_id', $member->id)
             ->findOrFail($id);
 
         return view('bookings.show', compact('booking'));
@@ -108,8 +131,26 @@ class BookingController extends Controller
     // Danh sách booking của user
     public function myBookings(Request $request)
     {
+        // LẤY MEMBER TỪ USER
+        $member = Auth::user()->member;
+
+        if (!$member) {
+            // Tự động tạo member nếu chưa có
+            $member = Member::create([
+                'user_id' => Auth::id(),
+                'name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+                'phone' => '',
+                'membership_type' => 'basic',
+                'membership_start' => now(),
+                'membership_end' => now()->addMonth(1),
+                'membership_price' => 0,
+                'status' => 'active',
+            ]);
+        }
+
         $query = Booking::with(['gymClass', 'gymClass.trainer'])
-            ->where('member_id', Auth::id());
+            ->where('member_id', $member->id);
 
         // Lọc theo status
         $status = $request->get('status', 'all');
@@ -139,7 +180,13 @@ class BookingController extends Controller
     // Hủy booking
     public function cancel(Request $request, $id)
     {
-        $booking = Booking::where('member_id', Auth::id())
+        $member = Auth::user()->member;
+
+        if (!$member) {
+            return back()->with('error', 'Không tìm thấy thông tin thành viên!');
+        }
+
+        $booking = Booking::where('member_id', $member->id)
             ->findOrFail($id);
 
         if (!$booking->canCancel()) {
@@ -158,7 +205,14 @@ class BookingController extends Controller
     // Check-in
     public function checkIn($id)
     {
-        $booking = Booking::findOrFail($id);
+        $member = Auth::user()->member;
+
+        if (!$member) {
+            return back()->with('error', 'Không tìm thấy thông tin thành viên!');
+        }
+
+        $booking = Booking::where('member_id', $member->id)
+            ->findOrFail($id);
 
         if (!$booking->canCheckIn()) {
             return back()->with('error', 'Không thể check-in booking này!');
@@ -172,7 +226,13 @@ class BookingController extends Controller
     // Đánh giá sau khi hoàn thành
     public function review(Request $request, $id)
     {
-        $booking = Booking::where('member_id', Auth::id())
+        $member = Auth::user()->member;
+
+        if (!$member) {
+            return back()->with('error', 'Không tìm thấy thông tin thành viên!');
+        }
+
+        $booking = Booking::where('member_id', $member->id)
             ->findOrFail($id);
 
         if (!$booking->canReview()) {
