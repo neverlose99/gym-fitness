@@ -28,6 +28,22 @@ class LoginController extends Controller
     protected $redirectTo = '/home';
 
     /**
+     * Determine where to redirect users after login.
+     *
+     * @return string
+     */
+    protected function redirectTo()
+    {
+        $user = auth()->user();
+
+        if ($user && str_contains($user->email, 'admin')) {
+            return '/admin/dashboard';
+        }
+
+        return '/';
+    }
+
+    /**
      * Create a new controller instance.
      *
      * @return void
