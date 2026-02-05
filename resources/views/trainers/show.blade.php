@@ -157,11 +157,15 @@
             </div>
 
             {{-- Certifications --}}
-            @if($trainer->certifications && count($trainer->certifications) > 0)
+            @php
+                $certifications = is_array($trainer->certifications) ? $trainer->certifications : [];
+            @endphp
+
+            @if(count($certifications) > 0)
             <div class="info-card">
                 <h4 class="fw-bold mb-3"><i class="fas fa-certificate"></i> Chứng chỉ</h4>
                 <div class="row">
-                    @foreach($trainer->certifications as $cert)
+                    @foreach($certifications as $cert)
                         <div class="col-md-6 mb-2">
                             <div class="achievement-item">
                                 <i class="fas fa-medal me-2"></i> {{ $cert }}
@@ -302,14 +306,18 @@
             </div>
 
             {{-- Working Schedule --}}
-            @if($trainer->working_days && count($trainer->working_days) > 0)
+            @php
+                $workingDays = is_array($trainer->working_days) ? $trainer->working_days : [];
+            @endphp
+
+            @if(count($workingDays) > 0)
             <div class="info-card">
                 <h5 class="fw-bold mb-3"><i class="fas fa-calendar-week"></i> Lịch làm việc</h5>
-                
+    
                 <div class="mb-3">
                     <strong>Ngày làm việc:</strong>
                     <div class="mt-2">
-                        @foreach($trainer->working_days as $day)
+                        @foreach($workingDays as $day)
                             <span class="badge bg-primary me-1 mb-1">{{ ucfirst($day) }}</span>
                         @endforeach
                     </div>
@@ -326,7 +334,6 @@
                 @endif
             </div>
             @endif
-
             {{-- Contact --}}
             <div class="info-card">
                 <h5 class="fw-bold mb-3"><i class="fas fa-envelope"></i> Liên hệ</h5>

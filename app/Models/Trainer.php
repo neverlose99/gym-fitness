@@ -87,7 +87,7 @@ class Trainer extends Model
     public function totalStudents()
     {
         return $this->bookings()
-            ->where('status', 'completed')
+            ->where('bookings.status', 'completed')
             ->distinct('member_id')
             ->count('member_id');
     }
