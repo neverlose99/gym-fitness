@@ -74,46 +74,41 @@ Route::middleware(['auth'])->group(function () {
 // ADMIN ROUTES (Uncomment when you create Admin Controllers)
 // ============================================
 
-/*
-// Import Admin Controllers first:
-// use App\Http\Controllers\Admin\AdminController;
-// use App\Http\Controllers\Admin\AdminMemberController;
-// use App\Http\Controllers\Admin\AdminTrainerController;
-// use App\Http\Controllers\Admin\AdminClassController;
-// use App\Http\Controllers\Admin\AdminBookingController;
-// use App\Http\Controllers\Admin\AdminReportController;
+// ============================================
+// 3. ADMIN ROUTES - routes/web.php
+// ============================================
+
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AdminMemberController;
+use App\Http\Controllers\Admin\AdminTrainerController;
+use App\Http\Controllers\Admin\AdminClassController;
+use App\Http\Controllers\Admin\AdminBookingController;
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     
     // Dashboard
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Members Management
     Route::resource('members', AdminMemberController::class);
+    Route::post('members/{id}/toggle-status', [AdminMemberController::class, 'toggleStatus'])->name('members.toggle-status');
     
     // Trainers Management
     Route::resource('trainers', AdminTrainerController::class);
+    Route::post('trainers/{id}/toggle-status', [AdminTrainerController::class, 'toggleStatus'])->name('trainers.toggle-status');
     
     // Classes Management
     Route::resource('classes', AdminClassController::class);
+    Route::post('classes/{id}/toggle-status', [AdminClassController::class, 'toggleStatus'])->name('classes.toggle-status');
     
     // Bookings Management
-    Route::prefix('bookings')->name('bookings.')->group(function () {
-        Route::get('/', [AdminBookingController::class, 'index'])->name('index');
-        Route::get('/{id}', [AdminBookingController::class, 'show'])->name('show');
-        Route::put('/{id}/confirm', [AdminBookingController::class, 'confirm'])->name('confirm');
-        Route::put('/{id}/complete', [AdminBookingController::class, 'complete'])->name('complete');
-        Route::delete('/{id}', [AdminBookingController::class, 'destroy'])->name('destroy');
-    });
-    
-    // Reports
-    Route::prefix('reports')->name('reports.')->group(function () {
-        Route::get('/revenue', [AdminReportController::class, 'revenue'])->name('revenue');
-        Route::get('/attendance', [AdminReportController::class, 'attendance'])->name('attendance');
-        Route::get('/members', [AdminReportController::class, 'members'])->name('members');
-    });
+    Route::get('bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
+    Route::get('bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
+    Route::put('bookings/{id}/confirm', [AdminBookingController::class, 'confirm'])->name('bookings.confirm');
+    Route::put('bookings/{id}/complete', [AdminBookingController::class, 'complete'])->name('bookings.complete');
+    Route::delete('bookings/{id}', [AdminBookingController::class, 'destroy'])->name('bookings.destroy');
 });
-*/
+
 
 // ============================================
 // API ROUTES (for AJAX requests)
