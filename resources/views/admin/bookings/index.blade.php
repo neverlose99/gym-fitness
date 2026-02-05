@@ -4,6 +4,23 @@
 @section('page-title', 'Đặt lịch')
 
 @section('content')
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form class="d-flex" method="GET">
+        <input name="search" class="form-control me-2" placeholder="Tìm mã hoặc tên thành viên..." value="{{ request('search') }}">
+        <select name="status" class="form-select me-2">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending" {{ request('status')=='pending' ? 'selected' : '' }}>Pending</option>
+            <option value="confirmed" {{ request('status')=='confirmed' ? 'selected' : '' }}>Confirmed</option>
+            <option value="completed" {{ request('status')=='completed' ? 'selected' : '' }}>Completed</option>
+            <option value="cancelled" {{ request('status')=='cancelled' ? 'selected' : '' }}>Cancelled</option>
+        </select>
+        <button class="btn btn-outline-secondary">Tìm</button>
+    </form>
+    <div>
+        <a href="{{ route('admin.bookings.index') }}" class="btn btn-sm btn-primary">Làm mới</a>
+    </div>
+</div>
+
 <div class="table-responsive">
     <table class="table">
         <thead>

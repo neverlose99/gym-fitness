@@ -37,6 +37,7 @@ class GymSeeder extends Seeder
         'price' => 100000,
         'status' => 'active',
         'is_featured' => true,
+        'image' => 'https://picsum.photos/seed/gym1/800/450',
         'created_at' => now(),
     ]);
 }

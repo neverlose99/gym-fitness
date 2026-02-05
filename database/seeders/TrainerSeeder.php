@@ -132,6 +132,8 @@ class TrainerSeeder extends Seeder
         ];
 
         foreach ($trainers as $trainer) {
+            // add placeholder avatar URLs for better display in demo
+            $trainer['avatar'] = 'https://i.pravatar.cc/300?u=' . urlencode($trainer['email']);
             Trainer::create($trainer);
         }
 

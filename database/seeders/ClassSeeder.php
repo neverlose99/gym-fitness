@@ -243,6 +243,9 @@ class ClassSeeder extends Seeder
 
         foreach ($classes as $classData) {
             $classData['slug'] = Str::slug($classData['name']);
+            // add placeholder image url so app can display images without storage
+            static $i = 1;
+            $classData['image'] = 'https://picsum.photos/seed/class' . $i++ . '/800/450';
             GymClass::create($classData);
         }
 

@@ -79,9 +79,15 @@ class Trainer extends Model
 
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar 
-            ? asset('storage/' . $this->avatar) 
-            : asset('images/default-trainer.png');
+        if (! $this->avatar) {
+            return asset('images/default-trainer.png');
+        }
+
+        if (str_starts_with($this->avatar, 'http')) {
+            return $this->avatar;
+        }
+
+        return asset('storage/' . $this->avatar);
     }
 
     public function totalStudents()

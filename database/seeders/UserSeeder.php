@@ -100,6 +100,7 @@ class UserSeeder extends Seeder
                     'user_id' => $user->id,
                     'name' => $userData['name'],
                     'phone' => $userData['phone'],
+                    'avatar' => 'https://i.pravatar.cc/300?u=' . urlencode($userData['email']),
                     'membership_type' => $userData['membership_type'],
                     'membership_start' => now()->subMonth(),
                     'membership_end' => now()->addMonths(11),

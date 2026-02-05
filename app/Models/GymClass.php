@@ -124,9 +124,15 @@ class GymClass extends Model
 
     public function getImageUrlAttribute()
     {
-        return $this->image 
-            ? asset('storage/' . $this->image) 
-            : asset('images/default-class.jpg');
+        if (! $this->image) {
+            return asset('images/default-class.jpg');
+        }
+
+        if (str_starts_with($this->image, 'http')) {
+            return $this->image;
+        }
+
+        return asset('storage/' . $this->image);
     }
 
     public function updateCurrentParticipants()

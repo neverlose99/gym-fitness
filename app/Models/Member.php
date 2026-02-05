@@ -78,9 +78,15 @@ class Member extends Model
 
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar 
-            ? asset('storage/' . $this->avatar) 
-            : asset('images/default-avatar.png');
+        if (! $this->avatar) {
+            return asset('images/default-avatar.png');
+        }
+
+        if (str_starts_with($this->avatar, 'http')) {
+            return $this->avatar;
+        }
+
+        return asset('storage/' . $this->avatar);
     }
 
     // Scopes
